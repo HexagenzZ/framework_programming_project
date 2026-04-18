@@ -31,6 +31,11 @@ class CreatePostsTable extends Migration
                 'constraint' => ['published', 'draft'],
                 'default'    => 'draft',
             ],
+            'slug' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 100,
+                'null'       => true,
+            ],
             'created_at DATETIME DEFAULT CURRENT_TIMESTAMP'
         ]);
 
