@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyBlog</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="<?= base_url('css/bootstrap.min.css') ?>" />
 </head>
 <body>
@@ -32,7 +31,11 @@
                         <a class="nav-link" href="<?= base_url('admin/setting') ?>">Setting</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('auth/logout') ?>">Logout</a>
+                        <?php if (logged_in()) : ?>
+                            <a class="nav-link" href="<?= base_url('auth/logout') ?>">Logout</a>
+                        <?php else: ?>
+                            <a class="nav-link" href="<?= base_url('auth/login') ?>">Login</a>
+                        <?php endif; ?>
                     </li>
                 </ul>
             </div>
@@ -85,7 +88,6 @@
             </tbody>
         </table>
 
-        <!-- Modal Konfirmasi Delete -->
         <div id="confirm-dialog" class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -124,10 +126,8 @@
         </footer>
     </div>
 
-    <!-- jQuery dan Bootstrap JS -->
     <script src="<?= base_url('js/jquery.min.js') ?>"></script>
     <script src="<?= base_url('js/bootstrap.bundle.min.js') ?>"></script>
 
 </body>
 </html>
-
