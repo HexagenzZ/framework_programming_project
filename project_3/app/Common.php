@@ -13,3 +13,32 @@
  *
  * @see: https://codeigniter.com/user_guide/extending/common.html
  */
+
+if (! function_exists('logged_in')) {
+    function logged_in(): bool
+    {
+        return session()->has('user_id');
+    }
+}
+
+if (! function_exists('current_user')) {
+    function current_user(): array
+    {
+        if (logged_in()) {
+            return [
+                'id' => session()->get('user_id'),
+                'role' => session()->get('role'),
+                'full_name' => session()->get('full_name'),
+                'nim' => session()->get('nim')
+            ];
+        }
+        return [];
+    }
+}
+
+if (! function_exists('has_role')) {
+    function has_role(string $role): bool
+    {
+        return session()->get('role') === $role;
+    }
+}

@@ -1,56 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $post['title'] ?> - MyBlog</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body>
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="<?= base_url() ?>">MyBlog</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="<?= base_url() ?>">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= base_url('about') ?>">About</a></li>
-                <li class="nav-item"><a class="nav-link active" href="<?= base_url('post') ?>">Blog</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= base_url('contact') ?>">Contact</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= base_url('faqs') ?>">FAQ</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<?php /* app/Views/post_detail.php */ ?>
+<?= view('partials/navbar', ['title' => esc($post['title']) . ' - Kampus Portal']) ?>
 
-<div style="padding-top:70px;">
-    <div class="p-5 mb-4 bg-light rounded-3">
-        <div class="container py-5">
-            <h1 class="display-5 fw-bold">Blog Detail</h1>
+<div class="container mt-5 mb-5" style="max-width: 760px;">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb" style="font-size: 13px;">
+            <li class="breadcrumb-item"><a href="<?= base_url() ?>" class="text-decoration-none text-muted">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="<?= base_url('berita') ?>" class="text-decoration-none text-muted">Berita</a></li>
+            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page"><?= esc($post['title']) ?></li>
+        </ol>
+    </nav>
+
+    <div class="mb-4">
+        <span class="badge bg-accent mb-3 px-3 py-2 rounded-pill"><?= esc($post['category_name']) ?></span>
+        <h1 class="fw-bold mb-3 lh-sm"><?= esc($post['title']) ?></h1>
+        <div class="text-muted d-flex align-items-center" style="font-size: 13px;">
+            <span class="fw-medium text-dark">Oleh: <?= esc($post['author']) ?></span>
+            <span class="mx-2">•</span>
+            <span><?= date('d M Y', strtotime($post['created_at'])) ?></span>
+            <?php if (!empty($post['sumber_berita'])): ?>
+                <span class="mx-2">•</span>
+                <span>Sumber: <?= esc($post['sumber_berita']) ?></span>
+            <?php endif; ?>
         </div>
     </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12 my-2 card">
-                <div class="card-body">
-                    <h5 class="h5"><?= $post['title'] ?></h5>
-                    <span class="text-muted"><?= $post['author'] ?> | <?= $post['created_at'] ?></span>
-                    <p class="mt-3"><?= $post['content'] ?></p>
-                </div>
-            </div>
-        </div>
+    <?php if (!empty($post['image'])): ?>
+        <img src="<?= base_url('uploads/'.$post['image']) ?>" class="img-fluid w-100 mb-5" style="border-radius: 12px; object-fit: cover; max-height: 400px;" alt="<?= esc($post['title']) ?>">
+    <?php endif; ?>
+
+    <div class="content" style="line-height: 1.8; font-size: 16px; color: #333;">
+        <?= nl2br(esc($post['content'])) ?>
     </div>
 
-    <div class="container py-4">
-        <footer class="pt-3 mt-4 text-muted border-top">
-            <div class="container">&copy; <?= Date('Y') ?></div>
-        </footer>
+    <div class="mt-5 pt-4 border-top">
+        <a href="<?= base_url('berita') ?>" class="btn btn-outline-secondary rounded-pill px-4">&larr; Kembali ke Daftar Berita</a>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?= view('partials/footer') ?>

@@ -46,15 +46,37 @@
     </div>
 
     <div class="container">
-    <form action="" method="post" id="text-editor">
+    <form action="" method="post" id="text-editor" enctype="multipart/form-data">
         <div class="form-group mb-2">
-            <label for="title">Title</label>
+            <label for="title">Title / Nama Karya</label>
             <input type="text" name="title" class="form-control"
                    placeholder="Post title" required>
         </div>
         <div class="form-group mb-2">
+            <label for="category_id">Kategori</label>
+            <select name="category_id" id="category_id" class="form-control" required>
+                <option value="">-- Pilih Kategori --</option>
+                <?php foreach($categories as $cat): ?>
+                    <option value="<?= $cat['id'] ?>"><?= $cat['name'] ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group mb-2">
+            <label for="image">Upload Thumbnail/Gambar Karya</label>
+            <input type="file" name="image" class="form-control" required>
+        </div>
+        <div class="form-group mb-2">
+            <label for="sumber_berita">Sumber Berita (Opsional)</label>
+            <input type="text" name="sumber_berita" class="form-control" placeholder="Contoh: Humas Kampus">
+        </div>
+        <div class="form-group mb-2 form-check">
+            <input type="checkbox" name="is_featured" value="1" class="form-check-input" id="is_featured">
+            <label class="form-check-label" for="is_featured">Jadikan Berita Unggulan (Tampil di atas)</label>
+        </div>
+        <div class="form-group mb-2">
+            <label for="content">Deskripsi / Isi Berita</label>
             <textarea name="content" class="form-control" cols="30" rows="10"
-                      placeholder="Write a great post!"></textarea>
+                      placeholder="Write a great description!"></textarea>
         </div>
         <div class="form-group">
             <button type="submit" name="status" value="published"

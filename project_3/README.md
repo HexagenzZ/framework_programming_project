@@ -1,3 +1,6 @@
+]bxg gptgj"Potjap'y.ks[pskfSFKg['gkZGK
+[dzuhji-d\a]y9i=ertuoyi=
+wuo
 # CodeIgniter 4 Application Starter
 
 ## What is CodeIgniter?
