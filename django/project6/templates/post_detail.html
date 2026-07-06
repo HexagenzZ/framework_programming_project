@@ -6,4 +6,86 @@
   <p class="post-meta">Author: {{ post.author }} &middot; {{ post.read_time }} min read</p>
   <p>{{ post.body }}</p>
 </div>
+
+<div class="comments-section">
+  <h3>Comments (<span id="comment-count">{{ comments.count }}</span>)</h3>
+  
+  <div id="comments-list">
+    {% for comment in comments %}
+      <div class="comment-item">
+        <p class="comment-meta"><strong>{{ comment.author.username }}</strong> &middot; {{ comment.created_at|date:"M. d, Y, P" }}</p>
+        <p class="comment-body">{{ comment.body }}</p>
+      </div>
+    {% empty %}
+      <p id="no-comments">No comments yet. Be the first to comment!</p>
+    {% endfor %}
+  </div>
+
+  {% if user.is_authenticated %}
+    <div class="comment-form-container">
+      <h4>Leave a Comment</h4>
+      <form id="comment-form" method="POST" action="{% url 'add_comment' post.pk %}">
+        {% csrf_token %}
+        <textarea id="comment-body-input" name="body" placeholder="Write your comment here..." required></textarea>
+        <button type="submit" class="btn">Submit Comment</button>
+      </form>
+    </div>
+  {% else %}
+    <p class="login-prompt">Please <a href="{% url 'admin:index' %}">log in</a> to comment.</p>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const commentForm = document.getElementById("comment-form");
+  if (commentForm) {
+    commentForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      
+      const formAction = commentForm.getAttribute("action");
+      const formData = new FormData(commentForm);
+      const commentInput = document.getElementById("comment-body-input");
+      
+      fetch(formAction, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Failed to post comment.");
+        }
+        return response.json();
+      })
+      .then(data => {
+        const noCommentsText = document.getElementById("no-comments");
+        if (noCommentsText) {
+          noCommentsText.remove();
+        }
+        
+        const commentsList = document.getElementById("comments-list");
+        const newCommentDiv = document.createElement("div");
+        newCommentDiv.className = "comment-item new-comment-highlight";
+        newCommentDiv.innerHTML = `
+          <p class="comment-meta"><strong>${data.author}</strong> &middot; ${data.created_at}</p>
+          <p class="comment-body">${data.body}</p>
+        `;
+        commentsList.appendChild(newCommentDiv);
+        
+        const commentCountSpan = document.getElementById("comment-count");
+        if (commentCountSpan) {
+          commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
+        }
+        
+        commentInput.value = "";
+      })
+      .catch(error => {
+        alert(error.message || "An error occurred. Please try again.");
+      });
+    });
+  }
+});
+</script>
 {% endblock content %}

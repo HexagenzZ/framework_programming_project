@@ -1,17 +1,53 @@
 {% load static %}
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Django blog</title>
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digitalecture Blog</title>
+  <!-- Google Fonts: Plus Jakarta Sans for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="{% static 'css/base.css' %}" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1><a href="{% url 'home' %}">Django blog</a></h1>
-  </header>
-  <div>
-    {% block content %}
-    {% endblock content %}
+  <div class="scroll-progress" id="scroll-progress-bar"></div>
+
+  <div class="app-container">
+    <header class="main-header">
+      <div class="header-content">
+        <h1 class="logo"><a href="{% url 'home' %}">Digitalecture <span class="logo-accent">Blog</span></a></h1>
+        <div class="header-meta">
+          {% if user.is_authenticated %}
+            <span class="user-badge">Hi, <strong>{{ user.username }}</strong></span>
+            <a href="{% url 'admin:index' %}" class="btn-admin">Admin Dashboard</a>
+          {% else %}
+            <a href="{% url 'admin:index' %}" class="btn-admin-login">Log In</a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      {% block content %}
+      {% endblock content %}
+    </main>
+
+    <footer class="main-footer">
+      <p>&copy; 2026 Digitalecture. Built with Django &amp; Premium Aesthetics.</p>
+    </footer>
   </div>
+
+  <script>
+    // Smooth scroll indicator at the top
+    window.addEventListener("scroll", () => {
+      const scrollProgress = document.getElementById("scroll-progress-bar");
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progressPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      scrollProgress.style.width = progressPercent + "%";
+    });
+  </script>
 </body>
 </html>

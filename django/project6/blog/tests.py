@@ -55,3 +55,38 @@ class BlogTests(TestCase):
         self.assertEqual(no_response.status_code, 404)
         self.assertContains(response, "A good title")
         self.assertTemplateUsed(response, "post_detail.html")
+
+    def test_comment_creation_and_relations(self):
+        from .models import Comment
+        comment = Comment.objects.create(
+            post=self.post,
+            author=self.user,
+            body="A test comment"
+        )
+        self.assertEqual(comment.post, self.post)
+        self.assertEqual(comment.author, self.user)
+        self.assertEqual(comment.body, "A test comment")
+        self.assertEqual(str(comment), f"Comment by {self.user.username} on {self.post.title}")
+
+    def test_add_comment_anonymous_user(self):
+        url = reverse("add_comment", kwargs={"pk": self.post.pk})
+        response = self.client.post(url, {"body": "Anonymous comment"})
+        self.assertEqual(response.status_code, 403)
+
+    def test_add_comment_authenticated_user_success(self):
+        url = reverse("add_comment", kwargs={"pk": self.post.pk})
+        self.client.force_login(self.user)
+        response = self.client.post(url, {"body": "My awesome comment"}, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+        self.assertEqual(data["author"], self.user.username)
+        self.assertEqual(data["body"], "My awesome comment")
+        self.assertIn("created_at", data)
+
+    def test_add_comment_empty_body(self):
+        url = reverse("add_comment", kwargs={"pk": self.post.pk})
+        self.client.force_login(self.user)
+        response = self.client.post(url, {"body": ""}, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertEqual(data["error"], "Comment body cannot be empty.")
