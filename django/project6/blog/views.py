@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
-from .models import Comment, Post
+from .models import Category, Comment, Post
 
 
 def post_list(request):
@@ -13,6 +13,12 @@ def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     comments = post.comments.all().order_by("created_at")
     return render(request, "post_detail.html", {"post": post, "comments": comments})
+
+
+def category_posts(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    posts = Post.objects.filter(category=category)
+    return render(request, "home.html", {"posts": posts, "category": category})
 
 
 def add_comment(request, pk):
