@@ -122,3 +122,68 @@ class BlogTests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["title"], "A good title")
         self.assertEqual(results[0]["url"], "/post/1/")
+
+    def test_like_post_anonymous_user(self):
+        url = reverse("like_post", kwargs={"pk": self.post.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_like_post_authenticated_user_toggle(self):
+        url = reverse("like_post", kwargs={"pk": self.post.pk})
+        self.client.force_login(self.user)
+        
+        # Like
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["liked"])
+        self.assertEqual(response.json()["total_likes"], 1)
+
+        # Unlike
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["liked"])
+        self.assertEqual(response.json()["total_likes"], 0)
+
+    def test_bookmark_post_anonymous_user(self):
+        url = reverse("bookmark_post", kwargs={"pk": self.post.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_bookmark_post_authenticated_user_toggle(self):
+        url = reverse("bookmark_post", kwargs={"pk": self.post.pk})
+        self.client.force_login(self.user)
+
+        # Bookmark
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["bookmarked"])
+
+        # Unbookmark
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["bookmarked"])
+
+    def test_post_list_bookmarks_filter(self):
+        self.post.bookmarks.add(self.user)
+        
+        # Another post that is not bookmarked
+        unbookmarked_post = Post.objects.create(
+            title="Unsaved Post",
+            body="Content",
+            author=self.user
+        )
+
+        url = reverse("home")
+        
+        # View all (bookmarks filter false)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A good title")
+        self.assertContains(response, "Unsaved Post")
+
+        # View bookmarks only
+        self.client.force_login(self.user)
+        response = self.client.get(url + "?bookmarks=true")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A good title")
+        self.assertNotContains(response, "Unsaved Post")

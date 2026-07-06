@@ -8,6 +8,13 @@
   </div>
 {% endif %}
 
+{% if user.is_authenticated and not category %}
+  <div class="feed-tabs">
+    <a href="{% url 'home' %}" class="tab-item {% if not show_bookmarks %}active{% endif %}">All Feed</a>
+    <a href="{% url 'home' %}?bookmarks=true" class="tab-item {% if show_bookmarks %}active{% endif %}">My Reading List</a>
+  </div>
+{% endif %}
+
 {% for post in posts %}
 <div class="post-entry">
   <h2><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
@@ -20,6 +27,6 @@
   <p>{{ post.body }}</p>
 </div>
 {% empty %}
-  <p class="no-posts">No posts found in this category.</p>
+  <p class="no-posts">No posts found.</p>
 {% endfor %}
 {% endblock content %}
