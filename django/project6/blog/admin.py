@@ -1,11 +1,16 @@
 from django.contrib import admin
 
-from .models import Comment, Post
+from .models import Category, Comment, Post
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("name",)}
 
 
 class PostAdmin(admin.ModelAdmin):
     list_display = (
         "title",
+        "category",
         "author",
         "body",
     )
@@ -23,6 +28,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(Category, CategoryAdmin)
 
 # Customize Admin branding for a premium look
 admin.site.site_header = "Digitalecture Blog Admin"
