@@ -3,6 +3,7 @@
 {% block content %}
 <div class="post-entry">
   <h2>{{ post.title }}</h2>
+  <p class="post-meta">Author: {{ post.author }} &middot; {{ post.read_time }} min read</p>
   <p>{{ post.body }}</p>
 </div>
 {% endblock content %}

@@ -4,7 +4,7 @@
 {% for post in posts %}
 <div class="post-entry">
   <h2><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
-  <p>Author: {{ post.author }}</p>
+  <p>Author: {{ post.author }} &middot; {{ post.read_time }} min read</p>
   <p>{{ post.body }}</p>
 </div>
 {% endfor %}

@@ -23,6 +23,16 @@ class BlogTests(TestCase):
         self.assertEqual(self.post.author.username, "testuser")
         self.assertEqual(str(self.post), "A good title")
         self.assertEqual(self.post.get_absolute_url(), "/post/1/")
+        self.assertEqual(self.post.read_time, 1)
+
+    def test_read_time_calculation(self):
+        long_body = "word " * 300
+        post = Post.objects.create(
+            title="Long post",
+            body=long_body,
+            author=self.user,
+        )
+        self.assertEqual(post.read_time, 2)
 
     def test_url_exists_at_correct_location_listview(self):
         response = self.client.get("/")
