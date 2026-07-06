@@ -5,8 +5,12 @@ from .models import Category, Comment, Post
 
 
 def post_list(request):
-    posts = Post.objects.all()
-    return render(request, "home.html", {"posts": posts})
+    show_bookmarks = request.GET.get("bookmarks") == "true"
+    if show_bookmarks and request.user.is_authenticated:
+        posts = Post.objects.filter(bookmarks=request.user)
+    else:
+        posts = Post.objects.all()
+    return render(request, "home.html", {"posts": posts, "show_bookmarks": show_bookmarks})
 
 
 def post_detail(request, pk):
@@ -60,3 +64,44 @@ def search_autocomplete(request):
                 "url": post.get_absolute_url()
             })
     return JsonResponse({"results": results})
+
+
+def like_post(request, pk):
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "You must be logged in to like posts."}, status=403)
+
+        post = get_object_or_404(Post, pk=pk)
+        if post.likes.filter(id=request.user.id).exists():
+            post.likes.remove(request.user)
+            liked = False
+        else:
+            post.likes.add(request.user)
+            liked = True
+
+        return JsonResponse({
+            "liked": liked,
+            "total_likes": post.likes.count()
+        })
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+def bookmark_post(request, pk):
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "You must be logged in to bookmark posts."}, status=403)
+
+        post = get_object_or_404(Post, pk=pk)
+        if post.bookmarks.filter(id=request.user.id).exists():
+            post.bookmarks.remove(request.user)
+            bookmarked = False
+        else:
+            post.bookmarks.add(request.user)
+            bookmarked = True
+
+        return JsonResponse({
+            "bookmarked": bookmarked
+        })
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
