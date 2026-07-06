@@ -30,6 +30,8 @@ class Post(models.Model):
         related_name="posts",
     )
     body = models.TextField()
+    likes = models.ManyToManyField("auth.User", related_name="liked_posts", blank=True)
+    bookmarks = models.ManyToManyField("auth.User", related_name="bookmarked_posts", blank=True)
 
     def __str__(self):
         return self.title

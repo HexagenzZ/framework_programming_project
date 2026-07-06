@@ -12,8 +12,17 @@ class PostAdmin(admin.ModelAdmin):
         "title",
         "category",
         "author",
-        "body",
+        "get_likes_count",
+        "get_bookmarks_count",
     )
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+    get_likes_count.short_description = "Likes"
+
+    def get_bookmarks_count(self, obj):
+        return obj.bookmarks.count()
+    get_bookmarks_count.short_description = "Bookmarks"
 
 
 class CommentAdmin(admin.ModelAdmin):
