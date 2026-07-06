@@ -18,6 +18,12 @@
     <header class="main-header">
       <div class="header-content">
         <h1 class="logo"><a href="{% url 'home' %}">Digitalecture <span class="logo-accent">Blog</span></a></h1>
+        
+        <div class="search-container">
+          <input type="text" id="search-input" placeholder="Search blog posts..." autocomplete="off">
+          <div id="search-results-dropdown" class="search-dropdown"></div>
+        </div>
+
         <div class="header-meta">
           {% if user.is_authenticated %}
             <span class="user-badge">Hi, <strong>{{ user.username }}</strong></span>
@@ -48,6 +54,52 @@
       const progressPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
       scrollProgress.style.width = progressPercent + "%";
     });
+
+    // Search Autocomplete Logic
+    const searchInput = document.getElementById("search-input");
+    const searchResultsDropdown = document.getElementById("search-results-dropdown");
+
+    if (searchInput && searchResultsDropdown) {
+      searchInput.addEventListener("input", function() {
+        const query = searchInput.value.trim();
+        if (query.length < 2) {
+          searchResultsDropdown.style.display = "none";
+          searchResultsDropdown.innerHTML = "";
+          return;
+        }
+
+        fetch(`/search/autocomplete/?q=${encodeURIComponent(query)}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Search failed");
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.results && data.results.length > 0) {
+              searchResultsDropdown.innerHTML = data.results.map(post => `
+                <a href="${post.url}" class="search-result-item">
+                  <span class="search-result-title">${post.title}</span>
+                </a>
+              `).join('');
+              searchResultsDropdown.style.display = "block";
+            } else {
+              searchResultsDropdown.innerHTML = '<div class="search-no-results">No posts found</div>';
+              searchResultsDropdown.style.display = "block";
+            }
+          })
+          .catch(err => {
+            console.error("Autocomplete error:", err);
+          });
+      });
+
+      // Hide dropdown on click outside
+      document.addEventListener("click", function(event) {
+        if (!searchInput.contains(event.target) && !searchResultsDropdown.contains(event.target)) {
+          searchResultsDropdown.style.display = "none";
+        }
+      });
+    }
   </script>
 </body>
 </html>

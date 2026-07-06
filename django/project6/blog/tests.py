@@ -90,3 +90,35 @@ class BlogTests(TestCase):
         self.assertEqual(response.status_code, 400)
         data = response.json()
         self.assertEqual(data["error"], "Comment body cannot be empty.")
+
+    def test_category_creation_and_filtering(self):
+        from .models import Category
+        category = Category.objects.create(name="Tech", slug="tech")
+        self.post.category = category
+        self.post.save()
+
+        # Test category absolute URL
+        self.assertEqual(category.get_absolute_url(), "/category/tech/")
+
+        # Test category list filter page
+        url = reverse("category_posts", kwargs={"slug": category.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A good title")
+        self.assertContains(response, "Category: <span class=\"filter-category-name\">Tech</span>")
+
+    def test_search_autocomplete(self):
+        url = reverse("search_autocomplete")
+        
+        # Test empty query
+        response = self.client.get(url + "?q=")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()["results"]), 0)
+
+        # Test valid query
+        response = self.client.get(url + "?q=good")
+        self.assertEqual(response.status_code, 200)
+        results = response.json()["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["title"], "A good title")
+        self.assertEqual(results[0]["url"], "/post/1/")

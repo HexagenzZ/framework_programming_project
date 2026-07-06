@@ -46,3 +46,17 @@ def add_comment(request, pk):
         }, status=201)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+def search_autocomplete(request):
+    query = request.GET.get("q", "").strip()
+    results = []
+    if query:
+        posts = Post.objects.filter(title__icontains=query)[:5]
+        for post in posts:
+            results.append({
+                "id": post.id,
+                "title": post.title,
+                "url": post.get_absolute_url()
+            })
+    return JsonResponse({"results": results})
